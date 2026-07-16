@@ -119,10 +119,12 @@ export async function handleSourceProspects(
   }
 
   // Verify campaign belongs to org
-  const campaign = await ctx.db.queryRow<{ id: string; name: string }>(
+  const campaignRows = await ctx.db.query<{ id: string; name: string }>(
     "SELECT id, name FROM sdr_campaigns WHERE id = $1 AND org_id = $2",
-    [campaign_id, org_id]
+    campaign_id,
+    org_id
   );
+  const campaign = campaignRows[0];
   if (!campaign) {
     return { status: 404, body: "Campaign not found" };
   }
@@ -150,11 +152,12 @@ export async function handleSourceProspects(
   }
 
   // Deduplicate against existing prospects in this campaign
-  const existingEmails = await ctx.db.queryRows<{ email: string }>(
+  const existingEmailRows = await ctx.db.query<{ email: string }>(
     "SELECT email FROM sdr_prospects WHERE org_id = $1 AND campaign_id = $2 AND email IS NOT NULL",
-    [org_id, campaign_id]
+    org_id,
+    campaign_id
   );
-  const existingEmailSet = new Set(existingEmails.map((r) => r.email.toLowerCase()));
+  const existingEmailSet = new Set(existingEmailRows.map((r) => r.email.toLowerCase()));
 
   const newContacts = apolloContacts.filter(
     (c) => c.email && !existingEmailSet.has(c.email.toLowerCase())
@@ -197,23 +200,21 @@ export async function handleSourceProspects(
           $15, 'new', NOW(), NOW()
         )
         ON CONFLICT (org_id, email) DO NOTHING`,
-        [
-          prospectId,
-          org_id,
-          campaign_id,
-          contact.first_name,
-          contact.last_name,
-          contact.email,
-          contact.title,
-          contact.organization_name,
-          contact.linkedin_url,
-          contact.city,
-          contact.state,
-          contact.country,
-          contact.seniority,
-          contact.id,
-          enrichmentJson,
-        ]
+        prospectId,
+        org_id,
+        campaign_id,
+        contact.first_name,
+        contact.last_name,
+        contact.email,
+        contact.title,
+        contact.organization_name,
+        contact.linkedin_url,
+        contact.city,
+        contact.state,
+        contact.country,
+        contact.seniority,
+        contact.id,
+        enrichmentJson
       );
       inserted++;
     } catch {
