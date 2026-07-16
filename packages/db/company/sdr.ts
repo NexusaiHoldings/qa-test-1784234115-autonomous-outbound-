@@ -163,4 +163,53 @@ CREATE INDEX IF NOT EXISTS idx_sdr_reply_labels_prospect_id
 CREATE INDEX IF NOT EXISTS idx_sdr_reply_labels_escalation
   ON sdr_reply_labels (org_id, escalation_status)
   WHERE escalation_status != 'none';
+
+CREATE TABLE IF NOT EXISTS sdr_meetings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  prospect_id uuid NOT NULL,
+  reply_label_id uuid,
+  title text NOT NULL,
+  description text,
+  start_at timestamptz NOT NULL,
+  end_at timestamptz NOT NULL,
+  calendar_event_id text,
+  calendar_link text,
+  booking_link text,
+  meeting_status text NOT NULL DEFAULT 'scheduled',
+  attendee_email text,
+  agenda text,
+  notes text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_sdr_meetings_org_id
+  ON sdr_meetings (org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_meetings_prospect_id
+  ON sdr_meetings (prospect_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_meetings_start_at
+  ON sdr_meetings (org_id, start_at);
+CREATE INDEX IF NOT EXISTS idx_sdr_meetings_reply_label
+  ON sdr_meetings (reply_label_id)
+  WHERE reply_label_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS sdr_research_briefs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  meeting_id uuid NOT NULL,
+  prospect_id uuid NOT NULL,
+  firm_snapshot jsonb NOT NULL DEFAULT '{}'::jsonb,
+  top_trigger_event_id uuid,
+  conversation_summary text,
+  talking_points jsonb NOT NULL DEFAULT '[]'::jsonb,
+  generated_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_research_briefs_meeting
+  ON sdr_research_briefs (meeting_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_research_briefs_org_id
+  ON sdr_research_briefs (org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_research_briefs_prospect_id
+  ON sdr_research_briefs (prospect_id);
 `;
