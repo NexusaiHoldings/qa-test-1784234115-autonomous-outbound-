@@ -213,4 +213,66 @@ CREATE INDEX IF NOT EXISTS idx_sdr_research_briefs_org_id
   ON sdr_research_briefs (org_id);
 CREATE INDEX IF NOT EXISTS idx_sdr_research_briefs_prospect_id
   ON sdr_research_briefs (prospect_id);
+
+CREATE TABLE IF NOT EXISTS sdr_sending_domains (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  domain text NOT NULL,
+  status text NOT NULL DEFAULT 'warming',
+  warmup_stage integer NOT NULL DEFAULT 1,
+  warmup_target_daily integer NOT NULL DEFAULT 50,
+  daily_send_count integer NOT NULL DEFAULT 0,
+  bounce_rate numeric(6,4) NOT NULL DEFAULT 0,
+  spam_complaint_rate numeric(6,4) NOT NULL DEFAULT 0,
+  last_checked_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_sending_domains_org_domain
+  ON sdr_sending_domains (org_id, domain);
+CREATE INDEX IF NOT EXISTS idx_sdr_sending_domains_org_id
+  ON sdr_sending_domains (org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_sending_domains_status
+  ON sdr_sending_domains (status);
+
+CREATE TABLE IF NOT EXISTS sdr_tenant_send_caps (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL UNIQUE,
+  daily_cap integer NOT NULL DEFAULT 500,
+  weekly_cap integer NOT NULL DEFAULT 2500,
+  daily_sent integer NOT NULL DEFAULT 0,
+  weekly_sent integer NOT NULL DEFAULT 0,
+  cap_override_reason text,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_sdr_tenant_send_caps_org_id
+  ON sdr_tenant_send_caps (org_id);
+
+CREATE TABLE IF NOT EXISTS sdr_provider_health (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider text NOT NULL UNIQUE,
+  rate_limit_total integer NOT NULL DEFAULT 0,
+  rate_limit_remaining integer NOT NULL DEFAULT 0,
+  rate_limit_reset_at timestamptz,
+  status text NOT NULL DEFAULT 'healthy',
+  last_error text,
+  checked_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS sdr_domain_anomalies (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text,
+  domain text,
+  anomaly_type text NOT NULL,
+  severity text NOT NULL DEFAULT 'warning',
+  message text NOT NULL,
+  resolved_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_sdr_domain_anomalies_active
+  ON sdr_domain_anomalies (created_at DESC)
+  WHERE resolved_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_sdr_domain_anomalies_org_id
+  ON sdr_domain_anomalies (org_id)
+  WHERE org_id IS NOT NULL;
 `;
