@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS sdr_suppressions (
   org_id text NOT NULL,
   email text NOT NULL,
   reason text NOT NULL DEFAULT 'unsubscribed',
+  notes text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_suppressions_org_email
