@@ -27,6 +27,7 @@ import type { HandlerContext, HandlerResult } from "@nexus/identity-and-access";
 import { handleSourceProspects } from "./source_prospects";
 import { handleSendSequenceTouch } from "./send_sequence_touch";
 import { handleRecordReplyLabel } from "./record_reply_label";
+import { handleBookCalendarMeeting } from "./book_calendar_meeting";
 
 type Args = Record<string, unknown>;
 
@@ -38,4 +39,5 @@ export const DOMAIN_DISPATCH: Record<
   source_prospects: (ctx, a) => handleSourceProspects(ctx, a),
   send_sequence_touch: (ctx, a) => handleSendSequenceTouch(ctx, a),
   record_reply_label: (ctx, a) => handleRecordReplyLabel(ctx, a),
+  book_calendar_meeting: (ctx, a) => handleBookCalendarMeeting(ctx, a),
 };
