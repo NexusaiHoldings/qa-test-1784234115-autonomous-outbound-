@@ -1,7 +1,9 @@
+"use server";
+
 /**
  * SDR campaign server actions and queries.
- * Functions with "use server" inline directives are callable from client
- * components as server actions.
+ * All functions in this file are server-only; client components call
+ * createCampaign as a server action via Next.js serialization.
  */
 
 import { cookies } from "next/headers";
@@ -86,7 +88,6 @@ export async function listCampaigns(): Promise<Campaign[]> {
 export async function createCampaign(
   input: CreateCampaignInput,
 ): Promise<{ ok: true; campaign: Campaign } | { ok: false; error: string }> {
-  "use server";
   const orgId = await resolveOrgId();
   if (!orgId) {
     return { ok: false, error: "Not authenticated" };
