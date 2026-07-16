@@ -1,5 +1,3 @@
-"use server";
-
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -53,6 +51,7 @@ export async function listSuppressions(): Promise<Suppression[]> {
 }
 
 export async function addSuppressionAction(formData: FormData): Promise<void> {
+  "use server";
   const orgId = await resolveOrgId();
   if (!orgId) {
     redirect("/login");
@@ -81,6 +80,7 @@ export async function addSuppressionAction(formData: FormData): Promise<void> {
 }
 
 export async function removeSuppressionAction(formData: FormData): Promise<void> {
+  "use server";
   const orgId = await resolveOrgId();
   if (!orgId) {
     redirect("/login");
@@ -101,6 +101,7 @@ export async function removeSuppressionAction(formData: FormData): Promise<void>
 }
 
 export async function importSuppressionsCsvAction(formData: FormData): Promise<void> {
+  "use server";
   const orgId = await resolveOrgId();
   if (!orgId) {
     redirect("/login");
