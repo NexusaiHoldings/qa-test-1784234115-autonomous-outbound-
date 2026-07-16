@@ -66,9 +66,9 @@ interface ProspectContext {
   enrichmentData: Record<string, unknown>;
   triggerEvents: TriggerEventSummary[];
   touches: Array<{
-    touchNumber: number;
+    touch_number: number;
     subject: string;
-    sentAt: string | null;
+    sent_at: string | null;
     status: string;
   }>;
   campaignVertical: string | null;
