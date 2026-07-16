@@ -63,6 +63,14 @@ export const LEGOS: readonly LegoConfig[] = [
   },
   {
     "config": {
+      "tier_ladder": [
+        {
+          "name": "Autonomous SDR \u2014 Flat",
+          "price_id": "price_1TtwFQ6WMeYkDDIum4mewq54",
+          "amount": 49900,
+          "interval": "month"
+        }
+      ],
       "default_currency": "usd",
       "enable_proration": true,
       "trial_days": 0
