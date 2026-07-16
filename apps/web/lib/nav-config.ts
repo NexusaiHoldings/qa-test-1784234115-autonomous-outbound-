@@ -1,6 +1,7 @@
 export type NavLink = {
   label: string;
   href: string;
+  adminOnly?: boolean;
 };
 
 export type NavGroup = {
