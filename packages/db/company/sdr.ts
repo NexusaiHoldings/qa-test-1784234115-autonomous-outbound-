@@ -26,4 +26,56 @@ CREATE INDEX IF NOT EXISTS idx_sdr_campaigns_org_id
   ON sdr_campaigns (org_id);
 CREATE INDEX IF NOT EXISTS idx_sdr_campaigns_created_at
   ON sdr_campaigns (created_at DESC);
+
+CREATE TABLE IF NOT EXISTS sdr_prospects (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  campaign_id uuid NOT NULL,
+  full_name text NOT NULL,
+  email text,
+  email_verified boolean NOT NULL DEFAULT false,
+  email_verification_status text NOT NULL DEFAULT 'unverified',
+  email_verification_sources jsonb NOT NULL DEFAULT '[]'::jsonb,
+  title text,
+  company text NOT NULL,
+  company_domain text,
+  linkedin_url text,
+  location text,
+  employee_count integer,
+  revenue_estimate text,
+  source text NOT NULL DEFAULT 'apollo',
+  apollo_contact_id text,
+  proxycurl_profile_id text,
+  enrichment_data jsonb NOT NULL DEFAULT '{}'::jsonb,
+  last_enriched_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_sdr_prospects_org_id
+  ON sdr_prospects (org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_prospects_campaign_id
+  ON sdr_prospects (campaign_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_prospects_email
+  ON sdr_prospects (email);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_prospects_org_apollo
+  ON sdr_prospects (org_id, apollo_contact_id)
+  WHERE apollo_contact_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS sdr_prospect_trigger_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  prospect_id uuid NOT NULL,
+  event_type text NOT NULL,
+  event_title text NOT NULL,
+  event_description text,
+  event_date timestamptz,
+  relevance_score numeric(5,2) NOT NULL DEFAULT 0,
+  source_url text,
+  is_top_trigger boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_sdr_trigger_events_prospect
+  ON sdr_prospect_trigger_events (prospect_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_trigger_events_org_top
+  ON sdr_prospect_trigger_events (org_id, is_top_trigger);
 `;
