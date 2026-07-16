@@ -28,6 +28,7 @@ import { handleSourceProspects } from "./source_prospects";
 import { handleSendSequenceTouch } from "./send_sequence_touch";
 import { handleRecordReplyLabel } from "./record_reply_label";
 import { handleBookCalendarMeeting } from "./book_calendar_meeting";
+import { handlePauseCampaignSending } from "./pause_campaign_sending";
 
 type Args = Record<string, unknown>;
 
@@ -40,4 +41,5 @@ export const DOMAIN_DISPATCH: Record<
   send_sequence_touch: (ctx, a) => handleSendSequenceTouch(ctx, a),
   record_reply_label: (ctx, a) => handleRecordReplyLabel(ctx, a),
   book_calendar_meeting: (ctx, a) => handleBookCalendarMeeting(ctx, a),
+  pause_campaign_sending: (ctx, a) => handlePauseCampaignSending(ctx, a),
 };
