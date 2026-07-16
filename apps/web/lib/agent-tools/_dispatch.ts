@@ -25,6 +25,7 @@
 
 import type { HandlerContext, HandlerResult } from "@nexus/identity-and-access";
 import { handleSourceProspects } from "./source_prospects";
+import { handleSendSequenceTouch } from "./send_sequence_touch";
 
 type Args = Record<string, unknown>;
 
@@ -34,4 +35,5 @@ export const DOMAIN_DISPATCH: Record<
 > = {
   // Build agent appends entries here per CTO-declared new_domain_tool.
   source_prospects: (ctx, a) => handleSourceProspects(ctx, a),
+  send_sequence_touch: (ctx, a) => handleSendSequenceTouch(ctx, a),
 };
