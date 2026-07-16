@@ -1,5 +1,3 @@
-"use server";
-
 /**
  * 3-touch cadence sequencer.
  * Enqueues email sequences for prospects and dispatches due touches via

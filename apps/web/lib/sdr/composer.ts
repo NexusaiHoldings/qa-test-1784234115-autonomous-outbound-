@@ -1,5 +1,3 @@
-"use server";
-
 /**
  * Trigger-grounded email composer for SDR sequences.
  * Calls the AI gateway (OpenAI-compatible, gpt-5.4-mini) to inject each
