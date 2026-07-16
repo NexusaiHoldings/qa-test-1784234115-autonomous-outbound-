@@ -78,4 +78,56 @@ CREATE INDEX IF NOT EXISTS idx_sdr_trigger_events_prospect
   ON sdr_prospect_trigger_events (prospect_id);
 CREATE INDEX IF NOT EXISTS idx_sdr_trigger_events_org_top
   ON sdr_prospect_trigger_events (org_id, is_top_trigger);
+
+CREATE TABLE IF NOT EXISTS sdr_suppressions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  email text NOT NULL,
+  reason text NOT NULL DEFAULT 'unsubscribed',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_suppressions_org_email
+  ON sdr_suppressions (org_id, email);
+CREATE INDEX IF NOT EXISTS idx_sdr_suppressions_org_id
+  ON sdr_suppressions (org_id);
+
+CREATE TABLE IF NOT EXISTS sdr_email_sequences (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  campaign_id uuid NOT NULL,
+  prospect_id uuid NOT NULL,
+  trigger_event_id uuid,
+  template_version text NOT NULL DEFAULT '1.0',
+  status text NOT NULL DEFAULT 'pending',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_sequences_prospect_campaign
+  ON sdr_email_sequences (prospect_id, campaign_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_sequences_org_id
+  ON sdr_email_sequences (org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_sequences_campaign_id
+  ON sdr_email_sequences (campaign_id);
+
+CREATE TABLE IF NOT EXISTS sdr_sequence_touches (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  sequence_id uuid NOT NULL,
+  touch_number integer NOT NULL,
+  subject text NOT NULL,
+  body text NOT NULL,
+  template_version text NOT NULL DEFAULT '1.0',
+  status text NOT NULL DEFAULT 'queued',
+  scheduled_at timestamptz NOT NULL,
+  sent_at timestamptz,
+  sendgrid_message_id text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_sdr_touches_sequence_id
+  ON sdr_sequence_touches (sequence_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_touches_org_status
+  ON sdr_sequence_touches (org_id, status);
+CREATE INDEX IF NOT EXISTS idx_sdr_touches_scheduled
+  ON sdr_sequence_touches (scheduled_at, status);
 `;
