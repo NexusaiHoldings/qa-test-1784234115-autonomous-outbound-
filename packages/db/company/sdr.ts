@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS sdr_sequence_touches (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id text NOT NULL,
   sequence_id uuid NOT NULL,
+  prospect_id uuid NOT NULL,
   touch_number integer NOT NULL,
   subject text NOT NULL,
   body text NOT NULL,
@@ -121,6 +122,7 @@ CREATE TABLE IF NOT EXISTS sdr_sequence_touches (
   scheduled_at timestamptz NOT NULL,
   sent_at timestamptz,
   sendgrid_message_id text,
+  reply_label text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -130,4 +132,35 @@ CREATE INDEX IF NOT EXISTS idx_sdr_touches_org_status
   ON sdr_sequence_touches (org_id, status);
 CREATE INDEX IF NOT EXISTS idx_sdr_touches_scheduled
   ON sdr_sequence_touches (scheduled_at, status);
+CREATE INDEX IF NOT EXISTS idx_sdr_touches_prospect_id
+  ON sdr_sequence_touches (prospect_id);
+
+CREATE TABLE IF NOT EXISTS sdr_reply_labels (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id text NOT NULL,
+  touch_id uuid NOT NULL,
+  prospect_id uuid NOT NULL,
+  raw_reply text NOT NULL,
+  classifier_label text NOT NULL,
+  classifier_confidence numeric(4,3) NOT NULL DEFAULT 0,
+  classifier_reasoning text,
+  founder_override_label text,
+  founder_override_reason text,
+  effective_label text NOT NULL,
+  escalation_status text NOT NULL DEFAULT 'none',
+  escalation_notified_at timestamptz,
+  draft_follow_up text,
+  approved_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sdr_reply_labels_touch_org
+  ON sdr_reply_labels (touch_id, org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_reply_labels_org_id
+  ON sdr_reply_labels (org_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_reply_labels_prospect_id
+  ON sdr_reply_labels (prospect_id);
+CREATE INDEX IF NOT EXISTS idx_sdr_reply_labels_escalation
+  ON sdr_reply_labels (org_id, escalation_status)
+  WHERE escalation_status != 'none';
 `;
